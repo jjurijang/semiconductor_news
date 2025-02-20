@@ -1,40 +1,60 @@
-# openweather api로 요청을 해서
-# 그 결과를 csv로 저장하는 py
-
-import requests
+import urllib.request
+import json
 import csv
-from datetime import datetime
 import os
+from datetime import datetime
 
-API_KEY = os.getenv("OPENWEATHER_API_KEY")
-CITY = "Seoul"
-URL = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric"
+# 네이버 검색 API 설정
+display = 10  # 가져올 뉴스 개수
+start = 1
+sort = "date"
+search = "AI"
 
-response = requests.get(URL)
-data = response.json()
-temp = data["main"]["temp"]
-humidity = data["main"]["humidity"]
-description = data["weather"][0]["description"]
-timezone = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-print(temp, humidity, description, timezone)
+# 환경변수에서 API 키 가져오기 (GitHub Actions에서 사용)
+client_id = os.getenv("NAVER_CLIENT_ID")
+client_secret = os.getenv("NAVER_CLIENT_SECRET")
+encText = urllib.parse.quote(search)
 
-# 위의 4개의 데이터를 가지는 csv파일 생성!!
-csv_filename = "seoul_weather.csv"
-header = ["timezone", "temp", "humidity", "description"]
+url = f"https://openapi.naver.com/v1/search/news?query={encText}&display={display}&start={start}&sort={sort}"
 
-# csv가 존재하면 -> True
-# csv가 존재하지 않으면 -> False
-file_exist = os.path.isfile(csv_filename)
+request = urllib.request.Request(url)
+request.add_header("X-Naver-Client-Id", client_id)
+request.add_header("X-Naver-Client-Secret", client_secret)
 
-# mode = "a" -> if not is file -> create
-# if is file -> write
-with open(csv_filename, "a", newline="") as file:
-    writer = csv.writer(file)
+response = urllib.request.urlopen(request)
+rescode = response.getcode()
 
-    # 파일이 존재하지 않는다 -> 헤더가 없다!!
-    if not file_exist:
-        writer.writerow(header)
+if rescode == 200:
+    response_body = response.read()
+    data = json.loads(response_body.decode("utf-8"))
+    items = data["items"]
 
-    writer.writerow([timezone, temp, humidity, description])
+    # CSV 파일 이름
+    csv_filename = "news_data.csv"
+    header = ["DateTime", "Title", "Link", "Description", "PubDate"]
 
-    print("csv 저장 완료!!")
+    # CSV 파일이 이미 존재하는지 확인
+    file_exist = os.path.isfile(csv_filename)
+
+    # CSV 파일 열기 (추가 모드)
+    with open(csv_filename, "a", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+
+        # 파일이 존재하지 않으면 헤더 추가
+        if not file_exist:
+            writer.writerow(header)
+
+        # 뉴스 데이터 추가
+        for item in items:
+            title = item["title"]
+            link = item["link"]
+            description = item["description"]
+            pubDate = item["pubDate"]
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            writer.writerow([timestamp, title, link, description, pubDate])
+
+    print("✅ 뉴스 데이터 CSV 저장 완료!")
+
+else:
+    print("❌ Error Code:", rescode)
