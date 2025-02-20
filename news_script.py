@@ -8,7 +8,7 @@ from datetime import datetime
 display = 10  # 가져올 뉴스 개수
 start = 1
 sort = "date"
-search = "AI"
+search = "반도체"
 
 # 환경변수에서 API 키 가져오기 (GitHub Actions에서 사용)
 client_id = os.getenv("NAVER_CLIENT_ID")
