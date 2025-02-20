@@ -36,6 +36,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
-          git add semicon_news.csv
+          git add news_data.csv
           git commit -m "Update news data (auto)"
           git push
