@@ -7,7 +7,7 @@ on:
 
   
 jobs:
-  fetch_news:
+  fetch_weather:
     runs-on: ubuntu-latest
 
     steps:
