@@ -1,13 +1,12 @@
-name: Fetch News Data
+name: Fetch News Data (CSV)
 
 on:
   schedule:
-    - cron: "*/20 * * * *"  # 1분마다 실행
+    - cron: "*/20 * * * *"  # 20분마다 실행
   workflow_dispatch:  # 수동 실행 가능
 
-  
 jobs:
-  fetch_weather:
+  fetch_news_csv:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,12 +27,12 @@ jobs:
         env:
           NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
-        run: python news_script.py
+        run: python save_news_csv.py  # 실행할 스크립트 이름
 
-      - name: 변경 사항 커밋 및 푸시
+      - name: 변경 사항 커밋 및 푸시 (강제 실행)
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
           git add news_data.csv
-          git commit -m "Update news data (auto)"
-          git push
+          git commit -m "Update news data (auto)" || echo "No changes"
+          git push || echo "No changes to push"
