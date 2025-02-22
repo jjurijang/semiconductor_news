@@ -10,7 +10,7 @@ start = 1
 sort = "date"
 search = "반도체"
 
-# 환경변수에서 API 키 가져오기 (GitHub Actions 등에서 사용)
+# 환경변수에서 API 키 가져오기 (GitHub Actions에서 사용)
 client_id = os.getenv("NAVER_CLIENT_ID")
 client_secret = os.getenv("NAVER_CLIENT_SECRET")
 encText = urllib.parse.quote(search)
@@ -33,13 +33,18 @@ if rescode == 200:
     csv_filename = "news_data.csv"
     header = ["DateTime", "Title", "Link", "Description", "PubDate"]
 
-    # 이렇게 하면 매번 실행할 때마다 CSV가 새로 작성되므로, 
-    # 항상 최신 100개의 뉴스만 보관됩니다.
-    with open(csv_filename, "w", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
-        writer.writerow(header)  # 헤더 작성
+    # CSV 파일이 이미 존재하는지 확인
+    file_exist = os.path.isfile(csv_filename)
 
-        # 최신 뉴스 데이터 100개를 그대로 작성
+    # CSV 파일 열기 (추가 모드)
+    with open(csv_filename, "a", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+
+        # 파일이 존재하지 않으면 헤더 추가
+        if not file_exist:
+            writer.writerow(header)
+
+        # 뉴스 데이터 추가
         for item in items:
             title = item["title"]
             link = item["link"]
@@ -49,4 +54,7 @@ if rescode == 200:
 
             writer.writerow([timestamp, title, link, description, pubDate])
 
-    print("✅ 뉴스 데이터 CSV 저장 완료! (최신 100개)")
+    print("✅ 뉴스 데이터 CSV 저장 완료!")
+
+else:
+    print("❌ Error Code:", rescode)
