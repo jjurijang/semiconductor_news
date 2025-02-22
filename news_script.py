@@ -33,18 +33,12 @@ if rescode == 200:
     csv_filename = "news_data.csv"
     header = ["DateTime", "Title", "Link", "Description", "PubDate"]
 
-    # CSV 파일이 이미 존재하는지 확인
-    file_exist = os.path.isfile(csv_filename)
-
-    # CSV 파일 열기 (추가 모드)
-    with open(csv_filename, "a", newline="", encoding="utf-8") as file:
+    # CSV 파일을 덮어쓰기 모드("w")로 열어서 항상 최신 뉴스 100개만 저장
+    with open(csv_filename, "w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
+        writer.writerow(header)  # 헤더 추가
 
-        # 파일이 존재하지 않으면 헤더 추가
-        if not file_exist:
-            writer.writerow(header)
-
-        # 뉴스 데이터 추가
+        # 뉴스 데이터 추가 (100개만 저장)
         for item in items:
             title = item["title"]
             link = item["link"]
@@ -54,7 +48,7 @@ if rescode == 200:
 
             writer.writerow([timestamp, title, link, description, pubDate])
 
-    print("✅ 뉴스 데이터 CSV 저장 완료!")
+    print("✅ 뉴스 데이터 CSV 저장 완료! (최신 100개 유지)")
 
 else:
     print("❌ Error Code:", rescode)
