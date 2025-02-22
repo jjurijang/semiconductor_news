@@ -50,5 +50,3 @@ if rescode == 200:
             writer.writerow([timestamp, title, link, description, pubDate])
 
     print("✅ 뉴스 데이터 CSV 저장 완료! (최신 100개)")
-else:
-    print("❌ Error Code:", rescode)
