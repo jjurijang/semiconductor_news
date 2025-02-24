@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 
 # 네이버 검색 API 설정
-display = 10  # 가져올 뉴스 개수
+display = 50  # 가져올 뉴스 개수
 start = 1
 sort = "date"
 search = "반도체"
